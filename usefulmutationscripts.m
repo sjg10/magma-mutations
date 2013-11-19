@@ -3,8 +3,6 @@
 //In particular with maximal reflexive/canonical WPS as per
 //[Kas10] Alexander Kasprzyk, Canonical toric Fano threefolds, Canadian Journal of Mathematics 62(2010), 1293-1309
 
-Attach('usefulmutationscripts.m');
-
 //Constructs the Sylvester sequence up to sylvrange on load
 sylvrange:=20;
 Syl:=[2];
