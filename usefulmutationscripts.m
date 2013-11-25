@@ -199,12 +199,13 @@ function breaks_terminal_on_k(wts,k)
 end function;
 
 //Calculates mutations tree of a WPS
-function mutation_tree(n,max_depth,seed)
+function mutation_tree(max_depth,seed)
     graph:=[];
+    n:=#seed-1;
     parent:=[0];//so the nth list of weights in graph came from the parent[n]'th guy in the previous block of graph
     parent:=parent cat [1 : i in [3..n+1]];
     former:=[seed];
-    current:=[mutate(seed,[2,i],1: verification:=false) : i in [3..n+1]];
+    current:=[mutate_on_vertex(seed,[2,i],1: verification:=false) : i in [3..n+1]];
     next:=[];
     depth:=2;
     while depth le max_depth do
@@ -214,7 +215,7 @@ function mutation_tree(n,max_depth,seed)
                 l:=[i: i in s];
                 for t in [1..n] do
                     if not t in l then
-                        bool,new_wts:=mutate(wts,l,t);
+                        bool,new_wts:=mutate_on_vertex(wts,l,t);
                         if bool and not new_wts in former then
                             Append(~next,new_wts);
                             Append(~parent,Index(current,wts));
