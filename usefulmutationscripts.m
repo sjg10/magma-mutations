@@ -52,7 +52,7 @@ end function;
 
 
 //Returns true iff the mutation specified is WPS to WPS
-function mutation_exists(wts,bottom_face,top_vertex)
+function mutation_exists(wts,bottom_face,top_vertex : print_working:=false)
     //returns a bool of whether a mutation of WPS to WPS exists
     bottom_face_fixed:=bottom_face[1];
     Remove(~bottom_face,1);
@@ -87,8 +87,10 @@ function mutation_exists(wts,bottom_face,top_vertex)
     if Index(new_vertices) ne 1 then
         return false;
     else
+        //print "Vertices:",V;
+        //print "w:",w;
         return true;
-    end if;
+        end if;
 end function;
 
 //Returns all possible one step mutations of a WPS to a WPS
@@ -109,7 +111,7 @@ function onestep(wts)
     return res;
 end function;
 
-//Mutates a WPS about a single vertex and can implement existence check
+//Mutates a WPS where the top face is a single vertex and can implement existence check
 function mutate_on_vertex(wts, bottom_face, top_vertex : verification:=true )
     //Returns mutated weights if going to WPS, false if no mutation exists.
     if verification and not mutation_exists(wts,bottom_face,top_vertex) then
@@ -205,7 +207,7 @@ function mutation_tree(max_depth,seed)
     parent:=[0];//so the nth list of weights in graph came from the parent[n]'th guy in the previous block of graph
     parent:=parent cat [1 : i in [3..n+1]];
     former:=[seed];
-    current:=[mutate_on_vertex(seed,[2,i],1: verification:=false) : i in [3..n+1]];
+    current:=former;
     next:=[];
     depth:=2;
     while depth le max_depth do
@@ -217,6 +219,7 @@ function mutation_tree(max_depth,seed)
                     if not t in l then
                         bool,new_wts:=mutate_on_vertex(wts,l,t);
                         if bool and not new_wts in former then
+                            print t,s,wts,new_wts;
                             Append(~next,new_wts);
                             Append(~parent,Index(current,wts));
                         end if;
@@ -225,13 +228,50 @@ function mutation_tree(max_depth,seed)
             end for;
         end for;
         depth:=depth+1;
-        Append(~graph,former);
-        former:=current;
+        Append(~graph,current);
         current:=next;
+        former:=former cat current;
         next:=[];
     end while;
-    Append(~graph,former);
     Append(~graph, current);
     return graph,parent;
 end function;
 
+function mutation_tree_search(max_depth,target,seed)
+    graph:=[];
+    n:=#seed-1;
+    parent:=[0];//so the nth list of weights in graph came from the parent[n]'th guy in the previous block of graph
+    parent:=parent cat [1 : i in [3..n+1]];
+    former:=[seed];
+    current:=[seed];
+    next:=[];
+    depth:=2;
+    while depth le max_depth do
+        //print current;
+        for wts in current do
+            for s in Subsets({1..n+1},2) do
+                l:=[i: i in s];
+                for t in [1..n] do
+                    if not t in l then
+                        bool,new_wts:=mutate_on_vertex(wts,l,t);
+                        if bool and not new_wts in former then
+                            //print wts,t,s,new_wts;
+                            Append(~next,new_wts);
+                            Append(~parent,Index(current,wts));
+                            if Sort(new_wts) eq Sort(target) then
+                                return true;
+                            end if;
+                        end if;
+                    end if;
+                end for;
+            end for;
+        end for;
+        depth:=depth+1;
+        Append(~graph,current);
+        former:= former cat current;
+        current:=next;
+        next:=[];
+    end while;
+    Append(~graph, current);
+    return false;
+end function;

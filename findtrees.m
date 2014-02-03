@@ -2,7 +2,7 @@
 //[Kas13] Alexander Kasprzyk, Classifying terminal weighted projective space,arXiv:1304.3029 [math.AG], 2013.
 //and
 // [AKN13] Gennadiy Averkov, Jan Kumpelmann, and Benjamin Nill, Largest integral simplices with one interior integral point: Solution of Hensley's conjecture and related results, arXiv:1309.7967 [math.CO] , 2013.
-load "usefulmutationsscripts.m";
+load "usefulmutationscripts.m";
 
 //Finds the mutation tree of the conjectured maximal canonical WPS
 function CanonicalWPSMutationTree(max_n,max_depth)
